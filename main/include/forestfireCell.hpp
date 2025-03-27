@@ -38,7 +38,7 @@ class forestfire : public GridCell<forestfireState, double> {
 			double y = sin(radians);
 			int myRow;
 			int myCol;
-
+			//get the row and column of the current cell
 			for (const auto& [neighborId, neighborData]: neighborhood) {
 				double v = neighborData.vicinity;
 					if (v == 0.98689){
@@ -50,17 +50,19 @@ class forestfire : public GridCell<forestfireState, double> {
 				auto nState = neighborData.state;
 				double v = neighborData.vicinity;
 				double nTemp = nState->temp;
+				//find relative position
 				int x_rel = neighborId[1] - myCol;
 				int y_rel = neighborId[0] - myRow;
+				//update temp with vicinity factors and wind
 				double t_change = (1+(wind_spd/30)*(x*x_rel-y*y_rel))*nTemp*v;
 				new_temp += t_change;
 			}
-
+		//passive border cell
 		if (state.fire_status == 0) {
 			state.temp = 300.0;
 			state.sigma = std::numeric_limits<double>::infinity();
 		}
-
+		//passive cells will wake if there is an input, go back to sleep if there is no change
 		else if(state.fire_status == 1) {
 			if(state.temp == 300.0){
 				double unburned_temp = new_temp+0.213;
@@ -76,6 +78,7 @@ class forestfire : public GridCell<forestfireState, double> {
 				}
 			}
 		}	
+		//A cell is heating up, if it doesn't hit ignition it passivates and goes back to status 1
 		else if(state.fire_status == 2) {
 			if(state.temp < 573.0) {
 				double unburned_temp = new_temp+0.213;		
@@ -88,6 +91,7 @@ class forestfire : public GridCell<forestfireState, double> {
 					state.sigma = 1.0;
 				}
 			}	
+			//if it ignites start the enthalpy formula, go to status 3
 			else if(state.temp >= 573.0) {
 				double burning_temp = new_temp+0.213+2.74*exp(-0.0019*(state.t_ig));		
 				state.fire_status = 3;
@@ -96,6 +100,7 @@ class forestfire : public GridCell<forestfireState, double> {
 				state.sigma = 1.0;
 			}
 		}
+		//keep burning with enthalpy, once it's burned off and cooled down, change the state to burned
 		else if(state.fire_status == 3) {
 			if(state.temp > 333.0) {
 				double burning_temp = new_temp+0.213+2.74*exp(-0.0019*(state.t_ig));		
@@ -110,6 +115,7 @@ class forestfire : public GridCell<forestfireState, double> {
 				state.sigma = 1.0;
 			}
 		}
+		//continues cooling until it reaches 300 and passivates
 		else if(state.fire_status == 4) {
 			double burned_temp = new_temp+0.213;		
 			state.temp = burned_temp;
@@ -123,7 +129,7 @@ class forestfire : public GridCell<forestfireState, double> {
 		
 		return state;
 	}
-
+	//Update time advance
 	[[nodiscard]] double outputDelay(const forestfireState& state) const override {
 		return state.sigma;   
 	}
