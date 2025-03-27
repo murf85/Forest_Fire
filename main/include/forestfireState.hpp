@@ -15,7 +15,7 @@ struct forestfireState {
 	forestfireState() : temp(300.0), fire_status(1), t_ig(0.0), sigma(1.0) {}
 };
 
-//! It prints the life of the cell in an output stream.
+//! It prints the temperature of the cell in an output stream.
 std::ostream& operator<<(std::ostream& os, const forestfireState& x) {
 	os << "<" << (x.temp) << ">";
 	return os;
