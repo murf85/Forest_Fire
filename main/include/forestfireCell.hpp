@@ -15,6 +15,8 @@ using namespace cadmium::celldevs;
 class forestfire : public GridCell<forestfireState, double> {
 	double wind_dir;
 	double wind_spd;
+	int myRow;
+	int myCol;
 	public:
 	
 	forestfire(const std::vector<int>& id, 
@@ -25,6 +27,9 @@ class forestfire : public GridCell<forestfireState, double> {
 			config->rawCellConfig.at("wind").get_to(wind_dir);
 			//wind speed in mph from config in json file
 			config->rawCellConfig.at("windspeed").get_to(wind_spd);
+			//get the row and column of the current cell
+			myRow = id[0];
+			myCol = id[1];
 		  }
 	
 	[[nodiscard]] forestfireState localComputation(forestfireState state,
@@ -36,16 +41,8 @@ class forestfire : public GridCell<forestfireState, double> {
 			// Calculate x and y components using cosine and sine
 			double x = cos(radians);
 			double y = sin(radians);
-			int myRow;
-			int myCol;
-			//get the row and column of the current cell
-			for (const auto& [neighborId, neighborData]: neighborhood) {
-				double v = neighborData.vicinity;
-					if (v == 0.98689){
-						myRow = neighborId[0];
-						myCol = neighborId[1];
-					}
-			}
+
+			//Loop through the neighbourhood to update the cell temperatures 
 			for (const auto& [neighborId, neighborData]: neighborhood) {
 				auto nState = neighborData.state;
 				double v = neighborData.vicinity;
