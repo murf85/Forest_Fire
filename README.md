@@ -4,8 +4,7 @@ Cell-DEVS Model of a forest fire based on the Corsica Model
 
 Introduction
 
-This repository contains a Cell-DEVS model of an Aircraft Transponder.  In addition to the top model, there are two coupled models representing a radar and an aircraft. 
-The radar sends interrogation pulses to the aircraft, and the aircraft replies with Mode A code or Mode C altitude.   
+This repository contains a Cell-DEVS model of a forest fire.  
 
 Dependencies
 
